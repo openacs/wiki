@@ -63,7 +63,7 @@ set context [list $title]
 set focus ""
 set header_stuff ""
 
-set write_p [permission::permission_p \
+set edit_link_p [permission::permission_p \
                  -object_id $item_id \
                  -party_id [ad_conn user_id] \
                  -privilege "write"

@@ -30,12 +30,6 @@ ad_form -name new -action "new" -export {name edit} -form {
     
 }  -new_data {
 
-    ns_log notice "
-DB --------------------------------------------------------------------------------
-DB DAVE debugging /var/lib/aolserver/openacs-5-1/packages/wiki/lib/new.tcl
-DB --------------------------------------------------------------------------------
-DB new.adp new_data
-DB --------------------------------------------------------------------------------"
     content::item::new \
         -name $name \
         -parent_id $folder_id \
@@ -48,17 +42,8 @@ DB -----------------------------------------------------------------------------
         -storage_type "text" \
         -mime_type "text/x-openacs-wiki"
 
-    # do something clever with internal refs
-    set stream [Wikit::Format::TextToStream $content]
-    set refs [Wikit::Format::StreamToRefs $stream "wiki::info"]
     
 } -edit_data {
-ns_log notice "
-DB --------------------------------------------------------------------------------
-DB DAVE debugging /var/lib/aolserver/openacs-5-1/packages/wiki/lib/new.tcl
-DB --------------------------------------------------------------------------------
-DB new.adp edit_data
-DB --------------------------------------------------------------------------------"
 
     content::revision::new \
         -item_id $item_id \
@@ -72,28 +57,15 @@ DB -----------------------------------------------------------------------------
     # do something clever with internal refs
     set stream [Wikit::Format::TextToStream $content]
     set refs [Wikit::Format::StreamToRefs $stream "wiki::info"]
-    ns_log notice "
-DB --------------------------------------------------------------------------------
-DB DAVE debugging /var/lib/aolserver/openacs-5-1/packages/wiki/lib/new.tcl
-DB --------------------------------------------------------------------------------
-DB refs = '${refs}'
-DB --------------------------------------------------------------------------------"
     if {![llength $refs]} {
         set refs [list ""]
     }
-    ns_log notice "
-DB --------------------------------------------------------------------------------
-DB DAVE debugging /var/lib/aolserver/openacs-5-1/packages/wiki/lib/new.tcl
-DB --------------------------------------------------------------------------------
-DB refs = '${refs}'
-DB --------------------------------------------------------------------------------"    
     db_foreach get_ids "select ci.item_id as ref_item_id from cr_items ci left join cr_item_rels cr on (cr.related_object_id=:item_id) where ci.parent_id=:folder_id and ci.name in ([template::util:::tcl_to_sql_list $refs]) and cr.rel_id is null" {
         content::item::relate \
             -item_id $item_id \
             -object_id $ref_item_id \
             -relation_tag "wiki_reference"
     } 
-
 
     ad_returnredirect "./$name"
 
