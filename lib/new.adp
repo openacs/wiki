@@ -6,3 +6,5 @@
   
 
   <formtemplate id="new"></formtemplate>
+
+  <include src="/packages/wiki/lib/footer">
