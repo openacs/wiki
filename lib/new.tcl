@@ -21,7 +21,7 @@ ad_form -name new -action "new" -export {name edit} -form {
     item_id:key
     title:text
     content:text(textarea)
-    revision_notes:text(textarea)
+    revision_notes:text(textarea),optional
     
 } -edit_request {
 
@@ -60,7 +60,9 @@ ad_form -name new -action "new" -export {name edit} -form {
     # do something clever with internal refs
     set stream [Wikit::Format::TextToStream $content]
     set refs [Wikit::Format::StreamToRefs $stream "wiki::info"]
-
+    if {![llength $refs]} {
+        set refs [list ""]
+    }
     db_foreach get_ids "select ci.item_id as ref_item_id from cr_items ci left join cr_item_rels cr on (cr.item_id=:item_id or cr.related_object_id=:item_id) where ci.parent_id=:folder_id and ci.name in ([template::util:::tcl_to_sql_list $refs]) and cr.rel_id is null" {
         content::item::relate \
             -item_id $item_id \

@@ -45,16 +45,14 @@ DB -----------------------------------------------------------------------------
     rp_internal_redirect "/packages/wiki/lib/new"
 }
 
-content::item::get -item_id $item_id -attributes [list [list text ""] [list content ""]]
-set revision_id $content_item(revision_id)
-set content [db_string get_content "select content from cr_revisions where revision_id=:revision_id" -default ""]
+
+db_1row get_content "select content,title from cr_revisions, cr_items where revision_id=live_revision and cr_items.item_id=:item_id"
 
 set stream [Wikit::Format::TextToStream $content]
 set refs [Wikit::Format::StreamToRefs $stream "wiki::info"]
 db_multirow related_items get_related_items "select cr.name, cr.title, cr.description from cr_revisionsx cr, cr_items ci, cr_item_rels cir where cir.related_object_id=:item_id and cir.relation_tag='wiki_reference' and ci.live_revision=cr.revision_id and ci.item_id=cir.item_id"
 
 set content [ad_wiki_text_to_html $content "wiki::info"]
-set title $content_item(title)
 set context [list $title]
 set focus ""
 set header_stuff ""
