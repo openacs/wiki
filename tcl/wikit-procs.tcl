@@ -770,12 +770,13 @@ namespace eval Wikit::Format {
 	    set info [$ip $text]
 	    foreach {id name date} $info break
 	    if {$id == ""} {continue}
-
-	    regexp {[0-9]+} $id id
+            ns_log notice "stream_to_refs id='${id} name='${name}'"
+	    #regexp {[0-9]+} $id id
 	    set pages($id) ""
 	}
-	
+	ns_log notice "returning names [array names pages]"
 	array names pages
+        
     }
 
     # Output specific conversion. Extracts all external references
