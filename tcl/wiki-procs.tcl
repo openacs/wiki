@@ -12,7 +12,7 @@ ad_library {
 
 namespace eval wiki:: {}
 
-ad_proc -public wiki::info {
+ad_proc -public wiki::get_info {
     ref
 } {
     Tries to resolve a wiki reference to

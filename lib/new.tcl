@@ -56,7 +56,7 @@ ad_form -name new -action "new" -export {name edit} -form {
 } -after_submit {    
     # do something clever with internal refs
     set stream [Wikit::Format::TextToStream $content]
-    set refs [Wikit::Format::StreamToRefs $stream "wiki::info"]
+    set refs [Wikit::Format::StreamToRefs $stream "wiki::get_info"]
     if {![llength $refs]} {
         set refs [list ""]
     }

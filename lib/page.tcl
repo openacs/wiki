@@ -55,10 +55,10 @@ DB -----------------------------------------------------------------------------
 db_1row get_content "select content,title from cr_revisions, cr_items where revision_id=live_revision and cr_items.item_id=:item_id"
 
 set stream [Wikit::Format::TextToStream $content]
-set refs [Wikit::Format::StreamToRefs $stream "wiki::info"]
+set refs [Wikit::Format::StreamToRefs $stream "wiki::get_info"]
 db_multirow related_items get_related_items "select cr.name, cr.title, cr.description from cr_revisionsx cr, cr_items ci, cr_item_rels cir where cir.related_object_id=:item_id and cir.relation_tag='wiki_reference' and ci.live_revision=cr.revision_id and ci.item_id=cir.item_id"
 
-set content [ad_wiki_text_to_html $content "wiki::info"]
+set content [ad_wiki_text_to_html $content "wiki::get_info"]
 set context [list $title]
 set focus ""
 set header_stuff ""
