@@ -12,7 +12,7 @@ ad_library {
 
 namespace eval wiki:: {}
 
-ad_proc -public wiki::info {
+ad_proc -public wiki::get_info {
     ref
 } {
     Tries to resolve a wiki reference to
@@ -37,7 +37,7 @@ ad_proc -public wiki::info {
     set package_id [ad_conn package_id]
     set d [db_string get_lm "select o.last_modified from acs_objects o, cr_items ci, cr_folders cf where cf.package_id=:package_id and ci.parent_id=cf.folder_id and ci.name=:ref and o.object_id=ci.item_id" -default ""]
     set ret [list "${ref}" "${ref}" "$d"]
-    ns_log notice "
+    ns_log debug "
 DB --------------------------------------------------------------------------------
 DB DAVE debugging procedure wiki::info
 DB --------------------------------------------------------------------------------
@@ -133,13 +133,13 @@ ad_proc -public ad_wiki_info {
     # ref doesn't exist yet
     
     set ret [list "${ref}" "${ref}" "1"]
-    ns_log notice "
-DB --------------------------------------------------------------------------------
-DB DAVE debugging procedure wiki::info
-DB --------------------------------------------------------------------------------
-DB ref = '${ref}'
-DB ret = '${ret}'
-DB --------------------------------------------------------------------------------"
+#    ns_log debug "
+#DB --------------------------------------------------------------------------------
+#DB DAVE debugging procedure wiki::info
+#DB --------------------------------------------------------------------------------
+#DB ref = '${ref}'
+#DB ret = '${ret}'
+#DB --------------------------------------------------------------------------------"
     return $ret
     
 }

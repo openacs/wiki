@@ -646,7 +646,6 @@ namespace eval Wikit::Format {
 			continue
 		    }
 		    set info [$ip $text]
-                    ns_log notice "info is $info"
 		    foreach {id name date} $info break
 
 		    if {$id == ""} {
@@ -770,12 +769,11 @@ namespace eval Wikit::Format {
 	    set info [$ip $text]
 	    foreach {id name date} $info break
 	    if {$id == ""} {continue}
-
-	    regexp {[0-9]+} $id id
+	    #regexp {[0-9]+} $id id
 	    set pages($id) ""
 	}
-	
 	array names pages
+        
     }
 
     # Output specific conversion. Extracts all external references

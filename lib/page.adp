@@ -12,4 +12,4 @@
     </multiple>
     </p>
     </if>
-<include src="footer" &write_p=write_p />
+<include src="footer" edit_link_p="@edit_link_p@" >

@@ -42,9 +42,6 @@ ad_form -name new -action "new" -export {name edit} -form {
         -storage_type "text" \
         -mime_type "text/x-openacs-wiki"
 
-    # do something clever with internal refs
-    set stream [Wikit::Format::TextToStream $content]
-    set refs [Wikit::Format::StreamToRefs $stream "wiki::info"]
     
 } -edit_data {
 
@@ -59,17 +56,16 @@ ad_form -name new -action "new" -export {name edit} -form {
 } -after_submit {    
     # do something clever with internal refs
     set stream [Wikit::Format::TextToStream $content]
-    set refs [Wikit::Format::StreamToRefs $stream "wiki::info"]
+    set refs [Wikit::Format::StreamToRefs $stream "wiki::get_info"]
     if {![llength $refs]} {
         set refs [list ""]
     }
-    db_foreach get_ids "select ci.item_id as ref_item_id from cr_items ci left join cr_item_rels cr on (cr.item_id=:item_id or cr.related_object_id=:item_id) where ci.parent_id=:folder_id and ci.name in ([template::util:::tcl_to_sql_list $refs]) and cr.rel_id is null" {
+    db_foreach get_ids "select ci.item_id as ref_item_id from cr_items ci left join cr_item_rels cr on (cr.related_object_id=:item_id) where ci.parent_id=:folder_id and ci.name in ([template::util:::tcl_to_sql_list $refs]) and cr.rel_id is null" {
         content::item::relate \
             -item_id $item_id \
             -object_id $ref_item_id \
             -relation_tag "wiki_reference"
     } 
-
 
     ad_returnredirect "./$name"
 

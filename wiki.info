@@ -11,11 +11,11 @@
         <owner url="mailto:dave@thedesignexperience,org">Dave Bauer</owner>
         <summary>Wiki</summary>
         <description format="text/plain">Wiki implementation on the CR</description>
-        <maturity>0</maturity>
 
         <provides url="wiki" version="0.1d"/>
 
         <callbacks>
+            <callback type="after-install"  proc="wiki::install::package_install"/>
             <callback type="after-instantiate"  proc="wiki::install::after_instantiate"/>
         </callbacks>
         <parameters>
