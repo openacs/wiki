@@ -20,7 +20,13 @@ if {$name eq ""} {
     # the path resolves directly to a site node
     set name "index"
 }
-
+ns_log notice "
+DB --------------------------------------------------------------------------------
+DB DAVE debugging /var/lib/aolserver/openacs-5-1/packages/wiki/lib/page.tcl
+DB --------------------------------------------------------------------------------
+DB name = '${name}'
+DB folder_id = '${folder_id}'
+DB --------------------------------------------------------------------------------"
 set item_id [content::item::get_id -item_path $name -resolve_index "t" -root_folder_id $folder_id]
 if {[string equal "" $item_id]} {
     rp_form_put name [ad_conn path_info]
