@@ -35,11 +35,25 @@ ad_proc -public wiki::get_info {
     # ref doesn't exist yet
     # this sucks we have to hammer the databse for every link
     set package_id [ad_conn package_id]
-    set d [db_string get_lm "select o.last_modified from acs_objects o, cr_items ci, cr_folders cf where cf.package_id=:package_id and ci.parent_id=cf.folder_id and ci.name=:ref and o.object_id=ci.item_id" -default ""]
+    set d [db_string get_lm "
+	select 
+		o.last_modified 
+	from 
+		acs_objects o, 
+		cr_items ci, 
+		cr_folders cf 
+	where 
+		cf.package_id = :package_id 
+		and ci.parent_id = cf.folder_id 
+		and ci.name = :ref 
+		and o.object_id = ci.item_id
+    " -default ""]
+
     set ret [list "${ref}" "${ref}" "$d"]
+
     ns_log debug "
 DB --------------------------------------------------------------------------------
-DB DAVE debugging procedure wiki::info
+DB DAVE debugging procedure wiki::get_info
 DB --------------------------------------------------------------------------------
 DB ref = '${ref}'
 DB ret = '${ret}'
@@ -68,7 +82,7 @@ ad_proc -public wiki::get_folder_id {
 } {
     # should really map site_nodes to cr_folders, but I
     # want to see what can be done with stock OpenACS
-    if {$package_id eq ""} {
+    if {$package_id == ""} {
        if  {[ad_conn -connected_p]} {
            set package_id [ad_conn package_id]
        } else {
@@ -102,7 +116,8 @@ ad_proc -public ad_wiki_text_to_html {
     @creation-date 2004-09-03
 } {
     set stream [Wikit::Format::TextToStream $text]
-# wiki::info will find the parent site node of a reference, and
+
+    # wiki::info will find the parent site node of a reference, and
     # look for a proc called package-key::wiki_info which should
     # return the id, name, modified date of the item
     # (i think id means "url" but I might be wrong!)
@@ -135,7 +150,7 @@ ad_proc -public ad_wiki_info {
     set ret [list "${ref}" "${ref}" "1"]
 #    ns_log debug "
 #DB --------------------------------------------------------------------------------
-#DB DAVE debugging procedure wiki::info
+#DB DAVE debugging procedure wiki::ad_wiki_info
 #DB --------------------------------------------------------------------------------
 #DB ref = '${ref}'
 #DB ret = '${ret}'
