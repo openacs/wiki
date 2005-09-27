@@ -111,7 +111,15 @@ namespace eval Wikit::Format {
 	foreach line [split $text \n] {
 	    # Per line, classify the it and extract the main textual information.
 	    foreach {tag depth txt aux} [linetype $line] break ; # lassign
-
+ns_log debug "
+DB --------------------------------------------------------------------------------
+DB DAVE debugging /var/lib/aolserver/openacs-5-2/packages/wiki/tcl/wikit-procs.tcl
+DB --------------------------------------------------------------------------------
+DB tag = '${tag}'
+DB depth = '${depth}'
+DB txt = '${txt}'
+DB aux = '${aux}' 
+DB --------------------------------------------------------------------------------"
 	    # Classification tags
 	    #
 	    # UL, OL, DL = Lists (unordered/bullet, ordered/enum,
@@ -119,12 +127,12 @@ namespace eval Wikit::Format {
 	    # PRE        = Verbatim / Quoted lines
 	    # HR         = Horizontal rule
 	    # STD        = Standard text
-
+            # H1,H2,H3,H4 = headers DAVEB
 	    ## Whenever we encounter a special line, not quoted, any
 	    ## preceding empty line has no further effect.
 	    #
 	    switch -exact -- $tag {
-		HR - UL - OL - DL {set empty_std 0}
+		HR - UL - OL - DL - H1 - H2 - H3 - H4 {set empty_std 0}
 		default {}
 	    }
 
@@ -133,7 +141,7 @@ namespace eval Wikit::Format {
 	    ## there is any.
 	    #
 	    switch -exact -- $tag {
-		HR - UL - OL - DL - PRE {
+		HR - UL - OL - DL - PRE - H1 - H2 - H3 - H4 {
 		    if {$paragraph != {}} {
 			lappend irep T 0 ; render $paragraph
 			set paragraph ""
@@ -152,6 +160,7 @@ namespace eval Wikit::Format {
 	    # PRE | 1             | text to display |
 	    # HR  | 0             | text of ruler   |
 	    # STD | 0             | text to display |
+            # H1-4| 1  DAVEB I have no clue how this works, I'll wing it!
 	    # ----+---------------+-----------------+---------------+---------------
 
 	    # HR     - Trivial
@@ -174,6 +183,10 @@ namespace eval Wikit::Format {
 		    lappend irep I 0 ; render $aux
 		    lappend irep D 0 ; render $txt
 		}
+                H1  {lappend irep A 0 ; render $txt} \
+                H2  {lappend irep B 0 ; render $txt} \
+                H3  {lappend irep C 0 ; render $txt} \
+                H4  {lappend irep E 0 ; render $txt} \
 		PRE {
 		    # Transform a preceding 'STD {}' into an empty Q line,
 		    # i.e make it part of the verbatim section, enforce
@@ -232,6 +245,12 @@ namespace eval Wikit::Format {
 	    UL	{^(   +)(\*) (\S.*)$}
 	    OL	{^(   +)(\d)\. (\S.*)$}
 	    DL	{^(   +)([^:]+):   (\S.*)$}
+            H4  {^()(====)(.*)====$}
+            H3  {^()(===)(.*)===$}
+            H2  {^()(==)(.*)==$}
+            H1  {^()(=)(.*)=$}
+
+                
 	} {
 	    # Compat: Remove restriction to multiples of 3 spaces.
 
@@ -630,6 +649,14 @@ namespace eval Wikit::Format {
 	set count 0
 	variable html_frag
 	foreach {mode text} $s {
+ns_log debug "
+DB --------------------------------------------------------------------------------
+DB DAVE debugging /var/lib/aolserver/openacs-5-2/packages/wiki/tcl/wikit-procs.tcl
+DB --------------------------------------------------------------------------------
+DB mode = '${mode}'
+DB text = '${text}'
+DB state = '${state}'
+DB --------------------------------------------------------------------------------"
 	    switch -exact -- $mode {
 		{}    {append result [quote $text]}
 		b - i {append result $html_frag($mode$text)}
@@ -683,7 +710,14 @@ namespace eval Wikit::Format {
 				[incr count] $html_frag(_a) \]
 		    }
 		}
-		T - Q - I - D - U - O - H {
+		T - Q - I - D - U - O - H - A - B - C - E {
+ns_log debug "
+DB --------------------------------------------------------------------------------
+DB DAVE debugging /var/lib/aolserver/openacs-5-2/packages/wiki/tcl/wikit-procs.tcl
+DB --------------------------------------------------------------------------------
+DB state = '${state}'
+DB mode = '${mode}'
+DB --------------------------------------------------------------------------------"
 		    append result $html_frag($state$mode)
 		    set state $mode
 		}
@@ -732,7 +766,22 @@ namespace eval Wikit::Format {
     vs I T  </dl><p> ;vs I Q </dl><pre> ;vs I U  </dl><ul><li> ;vs I O  </dl><ol><li>
     vs D T  </dl><p> ;vs D Q </dl><pre> ;vs D U  </dl><ul><li> ;vs D O  </dl><ol><li>
     vs H T       <p> ;vs H Q      <pre> ;vs H U       <ul><li> ;vs H O       <ol><li>
+    vs A T </h1><p> ;vs A Q </h1><pre>;vs A U </h1><ul><li> ;vs A O </h1><ol><li> 
+    vs B T </h2><p> ;vs B Q </h2><pre>;vs B U </h2><ul><li> ;vs B O </h2><ol><li> 
+    vs C T </h3><p> ;vs C Q </h3><pre>;vs C U </h3><ul><li> ;vs C O </h3><ol><li>             
+    vs E T </h4><p> ;vs E Q </h4><pre>;vs E U </h4><ul><li> ;vs E O </h4><ol><li> 
+            vs A B </h1><h2>; vs A C </h1><h3>
+            vs A A </h1><h1>; vs A E </h1><h4>
 
+            vs B A </h2><h1>; vs B C </h2><h3>
+            vs B B </h2><h2>; vs B E </h2><h4>
+
+            vs C A </h3><h1>; vs C C </h3><h3>
+            vs C B </h3><h2>; vs C E </h3><h4>
+
+            vs E A </h4><h1>; vs E C </h4><h3>
+            vs E B </h4><h2>; vs E E </h4><h4>                        
+            
     vs T I   </p><dl><dt> ;vs T D   </p><dl><dd>  ;vs T H   "</p><hr size=1>"  ;vs T _   </p>
     vs Q I </pre><dl><dt> ;vs Q D </pre><dl><dd>  ;vs Q H "</pre><hr size=1>"  ;vs Q _ </pre>
     vs U I  </ul><dl><dt> ;vs U D  </ul><dl><dd>  ;vs U H  "</ul><hr size=1>"  ;vs U _  </ul>
@@ -740,7 +789,48 @@ namespace eval Wikit::Format {
     vs I I           <dt> ;vs I D           <dd>  ;vs I H  "</dl><hr size=1>"  ;vs I _  </dl>
     vs D I           <dt> ;vs D D           <dd>  ;vs D H  "</dl><hr size=1>"  ;vs D _  </dl>
     vs H I       <dl><dt> ;vs H D       <dl><dd>  ;vs H H       "<hr size=1>"  ;vs H _     {}
-    #rename vs {}
+    vs A I </h1><dl><dt> ;vs A D </h1><dl><dd>  ;vs A H "/h1><hr size=1>" ;   
+    vs A _ </h1>
+
+    vs B I </h2><dl><dt> ;vs B D </h2><dl><dd>  ;vs B H "/h2><hr size=1>" ;   
+    vs B _ </h2>
+
+    vs C I </h3><dl><dt> ;vs C D </h3><dl><dd>  ;vs C H "/h3><hr size=1>" ;   
+    vs C _ </h3>
+
+    vs D I </h4><dl><dt> ;vs D D </h4><dl><dd>  ;vs D H "/h4><hr size=1>" ;   
+    vs D _ </h4>            
+
+            vs H A <h1>
+            vs H B <h2>
+            vs H C <h3>
+            vs H E <h4>
+            vs T A </p><h1>
+            vs T B </p><h2>
+            vs T C </p><h3>
+            vs T E </p><h4>
+            vs Q A </pre><h1>
+            vs Q B </pre><h2>
+            vs Q C </pre><h3>
+            vs Q E </pre><h4>
+            vs O A </ol><h1>
+            vs O B </ol><h2>
+            vs O C </ol><h3>
+            vs O E </ol><h4>
+            vs I A <h1>
+            vs I B <h2>
+            vs I C <h3>
+            vs I E <h4>
+            vs D A <h1>
+            vs D B <h2>
+            vs D C <h3>
+            vs D E <h4>
+            
+            
+            
+            
+            
+            #rename vs {}
 
     array set html_frag {
 	a_ {<a href="}  b0 </b>
