@@ -1,0 +1,40 @@
+
+
+.wiki-content img {
+	float: left;
+	margin: 4px;
+        padding: 15px;
+}
+
+.wiki-content ul {
+    border: 0px;
+	padding: 0px;
+	margin: 0px;
+}
+
+.wiki-content ul li {
+        border: 0px;
+	padding: 0px;
+	margin: 0px 0px 1px 50px;
+	list-style-image: url('/resources/bullet.png');
+}
+
+div.wiki-related-page {
+  float: right; 
+  width: 15%; 
+  border: 1px solid #cccccc; 
+  padding: 5px;
+  margin: 20px 5px 0px 0px;
+}
+
+.wiki-content div.footer {
+  clear: both;
+  border-top: 1px solid #ccc;
+  font-family: tahoma, verdana, helvetica, sans-serif;
+  font-size: 85%;
+  margin-top: 24px;
+  padding-top: 3px;
+  padding-bottom: 3px;
+  padding-left: 8px;
+  padding-right: 8px;
+}
