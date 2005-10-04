@@ -111,15 +111,6 @@ namespace eval Wikit::Format {
 	foreach line [split $text \n] {
 	    # Per line, classify the it and extract the main textual information.
 	    foreach {tag depth txt aux} [linetype $line] break ; # lassign
-ns_log debug "
-DB --------------------------------------------------------------------------------
-DB DAVE debugging /var/lib/aolserver/openacs-5-2/packages/wiki/tcl/wikit-procs.tcl
-DB --------------------------------------------------------------------------------
-DB tag = '${tag}'
-DB depth = '${depth}'
-DB txt = '${txt}'
-DB aux = '${aux}' 
-DB --------------------------------------------------------------------------------"
 	    # Classification tags
 	    #
 	    # UL, OL, DL = Lists (unordered/bullet, ordered/enum,
@@ -736,6 +727,9 @@ DB -----------------------------------------------------------------------------
 	regsub -all {<} $q {\&lt;}   q
 	regsub -all {>} $q {\&gt;}   q
 	regsub -all {&amp;(#\d+;)} $q {\&\1}   q
+	# allow <br> and <br />
+        regsub -all {\&lt;br\&gt;} $q {<br />} q
+        regsub -all {\&lt;br /\&gt;} $q {<br />} q        
 	return $q
     }
 
@@ -825,6 +819,10 @@ DB -----------------------------------------------------------------------------
             vs D B <h2>
             vs D C <h3>
             vs D E <h4>
+            vs U A </ul><h1>
+            vs U B </ul><h2>
+            vs U C </ul><h3>
+            vs U E </ul><h4>
             
             
             
