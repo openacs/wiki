@@ -52,6 +52,7 @@ ad_form -name new -action "new" -export {name edit} -form {
         -title $title \
         -content $content \
         -description $revision_notes \
+        -mime_type "text/x-openacs-wiki" \
 	-is_live "t"
 
 } -after_submit {    
