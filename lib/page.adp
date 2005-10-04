@@ -5,7 +5,7 @@
   <property name="focus">@focus@</property>
   <property name="header_stuff"><link rel="stylesheet" type="text/css" href="/resources/wiki/wiki.css" media="all"></property>  
 
-
+<div class="wiki-content">
 <if @related_items:rowcount@ gt 0>
 <div class="wiki-related-page">
 Pages that link to this page:
@@ -22,3 +22,4 @@ Pages that link to this page:
 
 
 <include src="footer" edit_link_p="@edit_link_p@" >
+</div>
