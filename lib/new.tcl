@@ -26,10 +26,9 @@ ad_form -name new -action "new" -export {name edit} -form {
 } -edit_request {
 
     #    content::item::get -item_id $item_id
-    db_1row get_item "select cr_items.item_id, title, content from cr_items, cr_revisions where name=:name and parent_id=:folder_id and latest_revision=revision_id"
+    db_0or1row get_item "select cr_items.item_id, title, content from cr_items, cr_revisions where name=:name and parent_id=:folder_id and latest_revision=revision_id"
     
 }  -new_data {
-
     content::item::new \
         -name $name \
         -parent_id $folder_id \
@@ -42,31 +41,55 @@ ad_form -name new -action "new" -export {name edit} -form {
         -storage_type "text" \
         -mime_type "text/x-openacs-wiki"
 
+    # see if any references exist that go to this page
+    db_foreach get_refs "select cr.rel_id from cr_item_rels cr, cr_items ci where ci.item_id=cr.object_id and ci.parent_id=:folder_id and cr.related_object_id is null and cr.relation_tag = 'wiki_reference__' || $name" {
+	db_dml update_rel "update cr_item_rels set related_object_id=:item_id where rel_id=:rel_id"
+    }
     
 } -edit_data {
-
     content::revision::new \
         -item_id $item_id \
         -title $title \
         -content $content \
-        -description $revision_notes
-
-    db_dml set_live "update cr_items set live_revision=latest_revision where item_id=:item_id"
+        -description $revision_notes \
+        -mime_type "text/x-openacs-wiki" \
+	-is_live "t"
 
 } -after_submit {    
     # do something clever with internal refs
     set stream [Wikit::Format::TextToStream $content]
     set refs [Wikit::Format::StreamToRefs $stream "wiki::get_info"]
-    if {![llength $refs]} {
-        set refs [list ""]
-    }
-    db_foreach get_ids "select ci.item_id as ref_item_id from cr_items ci left join cr_item_rels cr on (cr.related_object_id=:item_id) where ci.parent_id=:folder_id and ci.name in ([template::util:::tcl_to_sql_list $refs]) and cr.rel_id is null" {
-        content::item::relate \
-            -item_id $item_id \
-            -object_id $ref_item_id \
-            -relation_tag "wiki_reference"
-    } 
+    if {[llength $refs]} {
+        
+        array set existing_refs [list]
+        # get references that have cr_items already
+        db_foreach get_ids "select cr.rel_id,ci.item_id as ref_item_id, ci.name as ref_name from cr_items ci left join cr_item_rels cr on (cr.related_object_id=:item_id) where ci.parent_id=:folder_id and ci.name in ([template::util:::tcl_to_sql_list $refs])" {
+            set existing_refs($ref_name) $ref_item_id
+        }
 
+        foreach ref $refs {
+            # if there isn't an existing reference to a cr_item, create a
+            # new one and create the cr_item_rel
+            # leave the content blank until someone edits the page
+            if {![string equal "" $ref] && ![info exists existing_refs($ref)]} {
+                # no page exists for this link yet, create a placeholder
+                set existing_refs($ref) [content::item::new \
+                                             -name $ref \
+                                             -parent_id $folder_id \
+                                             -creation_user $user_id \
+                                             -creation_ip $ip_address \
+                                             -is_live "t" \
+                                             -storage_type "text" \
+                                             -mime_type "text/x-openacs-wiki"]
+
+                content::item::relate \
+                    -item_id $item_id \
+                    -object_id $existing_refs($ref) \
+                    -relation_tag "wiki_reference"
+            }
+            
+        } 
+    }
     ad_returnredirect "./$name"
 
 } 

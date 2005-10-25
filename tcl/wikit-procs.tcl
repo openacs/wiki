@@ -111,15 +111,6 @@ namespace eval Wikit::Format {
 	foreach line [split $text \n] {
 	    # Per line, classify the it and extract the main textual information.
 	    foreach {tag depth txt aux} [linetype $line] break ; # lassign
-ns_log debug "
-DB --------------------------------------------------------------------------------
-DB DAVE debugging /var/lib/aolserver/openacs-5-2/packages/wiki/tcl/wikit-procs.tcl
-DB --------------------------------------------------------------------------------
-DB tag = '${tag}'
-DB depth = '${depth}'
-DB txt = '${txt}'
-DB aux = '${aux}' 
-DB --------------------------------------------------------------------------------"
 	    # Classification tags
 	    #
 	    # UL, OL, DL = Lists (unordered/bullet, ordered/enum,
@@ -526,10 +517,10 @@ DB -----------------------------------------------------------------------------
 		x {
 		    # support embedded images if present in "images" view
 		    set iseq ""
-		    if {[regexp {\.(gif|jpg|png)$} $text - ifmt]} {
+		    if {[regexp -nocase {\.(gif|jpg|png)$} $text - ifmt]} {
 			set iseq [mk::select wdb.images url $text -count 1]
 			if {$iseq != "" && [info commands eim_$iseq] == ""} {
-			    if {$ifmt == "jpg"} { set ifmt jpeg }
+			    if {[string equal -nocase $ifmt "jpg"]} { set ifmt jpeg }
 			    catch { package require tkimg::$ifmt }
 			    catch {
 			    	image create photo eim_$iseq -format $ifmt \
@@ -702,7 +693,7 @@ DB -----------------------------------------------------------------------------
 			    [quote $text] $html_frag(_a)
 		}
 		x {
-		    if {[regexp {\.(gif|jpg|png)$} $text]} {
+		    if {[regexp -nocase {\.(gif|jpg|png)$} $text]} {
 			append result $html_frag(i_) $text $html_frag(tc)
 		    } else {
 			append result \
@@ -736,6 +727,9 @@ DB -----------------------------------------------------------------------------
 	regsub -all {<} $q {\&lt;}   q
 	regsub -all {>} $q {\&gt;}   q
 	regsub -all {&amp;(#\d+;)} $q {\&\1}   q
+	# allow <br> and <br />
+        regsub -all {\&lt;br\&gt;} $q {<br />} q
+        regsub -all {\&lt;br /\&gt;} $q {<br />} q        
 	return $q
     }
 
@@ -825,6 +819,10 @@ DB -----------------------------------------------------------------------------
             vs D B <h2>
             vs D C <h3>
             vs D E <h4>
+            vs U A </ul><h1>
+            vs U B </ul><h2>
+            vs U C </ul><h3>
+            vs U E </ul><h4>
             
             
             
