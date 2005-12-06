@@ -52,8 +52,7 @@ DB -----------------------------------------------------------------------------
 }
 
 
-if {![db_0or1row get_content "select content,title from cr_revisions, cr_items where revision_id=live_revision and cr_items.item_id=:item_id"]} {
-    
+if {![db_0or1row get_content "select o.last_modified, person__name(o.creation_user) as modified_by, cr.content,cr.title from cr_revisions cr, acs_objects o, cr_items ci where cr.revision_id=ci.live_revision and ci.item_id=:item_id and cr.revision_id=o.object_id"]} {
     set form [rp_getform]
     ns_log debug "
 DB --------------------------------------------------------------------------------
@@ -69,7 +68,7 @@ DB -----------------------------------------------------------------------------
     rp_internal_redirect "/packages/wiki/lib/new"
 }
 
-
+set last_modified [lc_time_fmt $last_modified %c]
 set stream [Wikit::Format::TextToStream $content]
 set refs [Wikit::Format::StreamToRefs $stream "wiki::get_info"]
 db_multirow related_items get_related_items "select cr.name, cr.title, cr.description from cr_revisionsx cr, cr_items ci, cr_item_rels cir where cir.related_object_id=:item_id and cir.relation_tag='wiki_reference' and ci.live_revision=cr.revision_id and ci.item_id=cir.item_id"

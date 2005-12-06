@@ -19,7 +19,7 @@ Pages that link to this page:
 
 @content;noquote@
 
-
-
+<hr />
+Modified by @modified_by@ on @last_modified@
 <include src="footer" edit_link_p="@edit_link_p@" >
 </div>
