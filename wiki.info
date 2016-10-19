@@ -10,7 +10,8 @@
     <version name="0.9d" url="http://openacs.org/repository/download/apm/wiki-0.9d.apm">
         <owner url="mailto:dave@thedesignexperience,org">Dave Bauer</owner>
         <summary>Wiki</summary>
-        <description format="text/plain">Wiki implementation on the CR</description>
+        <description format="text/plain">Wiki implementation on the CR; deprecated, use xowiki instead</description>
+	<maturity>4</maturity>
 
         <provides url="wiki" version="0.9d"/>
         <requires url="acs-kernel" version="5.2.0a1"/>
