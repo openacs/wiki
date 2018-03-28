@@ -33,7 +33,7 @@ ad_proc -public wiki::get_info {
     # second element I have no idea
     # 3rd element is the last modified date. leave empty if the
     # ref doesn't exist yet
-    # this sucks we have to hammer the databse for every link
+    # this sucks we have to hammer the database for every link
     set package_id [ad_conn package_id]
     set d [db_string get_lm "select o.last_modified from acs_objects o, cr_items ci, cr_folders cf where cf.package_id=:package_id and ci.parent_id=cf.folder_id and ci.name=:ref and o.object_id=ci.item_id" -default ""]
     set ret [list "${ref}" "${ref}" "$d"]
