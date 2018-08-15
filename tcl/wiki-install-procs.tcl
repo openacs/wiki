@@ -1,12 +1,9 @@
-# 
-
 ad_library {
     
     Install callbacks for wiki package
     
     @author Dave Bauer (dave@thedesignexperience.org)
     @creation-date 2004-09-06
-    @arch-tag: 86a85f67-568e-422f-bd56-6c8fba89f1a2
     @cvs-id $Id$
 }
 

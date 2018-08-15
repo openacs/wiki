@@ -1,18 +1,15 @@
 ad_page_contract {
 
+ Show or edit wiki pages
+
+ @author Dave Bauer (dave@thedesignexperience.org)
+ @creation-date 2004-09-03
+ @cvs-id $Id$
+
 } -query {
     edit:optional
     revision_id:optional
 }
-
-# 
-#
-# Show or edit wiki pages
-#
-# @author Dave Bauer (dave@thedesignexperience.org)
-# @creation-date 2004-09-03
-# @arch-tag: e5d58124-f276-4a01-a61a-e85959bbe0d1
-# @cvs-id $Id$
 
 set folder_id [wiki::get_folder_id]
 set name [ad_conn path_info]

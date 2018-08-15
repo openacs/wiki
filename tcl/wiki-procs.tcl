@@ -1,12 +1,9 @@
-# 
-
 ad_library {
     
     procs for wiki style cms
     
     @author Dave Bauer (dave@thedesignexperience.org)
     @creation-date 2004-09-03
-    @arch-tag: 407a000b-0f99-4129-ae94-40679a0d4df2
     @cvs-id $Id$
 }
 
